@@ -3,29 +3,33 @@
     <section>
       <ul>
         <li v-for="(item,i) in dataList">
-          <template
-            v-if="item.file_url.split('.')[1] == 'doc' || item.file_url.split('.')[1] == 'docx' || item.file_url.split('.')[1] == 'pdf'"
-          >
-            <object data="2018.pdf" type="application/pdf">
-              <a ref="pdf" :href="link_pdf" target="_blank" @click="openFile(item)">
-                <div>
-                  <p>
-                    <span class="title">{{item.subject == 1? "数学":"英语"}}</span>
-                    &nbsp;&nbsp;&nbsp;
-                    <span class="title-text">{{item.materials_name}}</span>
-                  </p>
-                  <span>{{item.create_time}}</span>
-                </div>
-              </a>
-            </object>
+          <template v-if="item.file_url.split('.')[1] == 'pdf'">
+            <!-- <object :data="link_pdf" type="application/pdf"> -->
+            <a ref="pdf" :href="link_pdf" @click="openFile(item)">
+              <div>
+                <p>
+                  <span class="title">{{item.subject}}</span>
+                  &nbsp;&nbsp;&nbsp;
+                  <span
+                    class="title-text"
+                  >{{item.materials_name}}</span>
+                </p>
+                <span>{{item.create_time}}</span>
+              </div>
+            </a>
+            <!-- </object> -->
           </template>
-          <template v-if="item.file_url.split('.')[1] == 'word'">
+          <template
+            v-if="item.file_url.split('.')[1] == 'doc' || item.file_url.split('.')[1] == 'docx'"
+          >
             <a ref="word" :href="link_word" rel="nofollow" @click="openFile(item)">
               <div>
                 <p>
-                  <span class="title">{{item.subject == 1? "数学":"英语"}}</span>
+                  <span class="title">{{item.subject}}</span>
                   &nbsp;&nbsp;&nbsp;
-                  <span class="title-text">{{item.materials_name}}</span>
+                  <span
+                    class="title-text"
+                  >{{item.materials_name}}</span>
                 </p>
                 <span>{{item.create_time}}</span>
               </div>
@@ -55,13 +59,13 @@ export default {
   },
   methods: {
     openFile(item) {
-      if (item.file_url.split(".")[1] == "doc") {
-        this.link_pdf = "http://liveapi.canpoint.net/" + item.file_url;
+      if (
+        item.file_url.split(".")[1] == "doc" ||
+        item.file_url.split(".")[1] == "docx"
+      ) {
+        this.link_word = "http://liveh5.canpoint.net/" + item.file_url;
       } else {
-        this.link_word =
-          "https://view.officeapps.live.com/op/view.aspx?src=" +
-          "http://liveapi.canpoint.net/" +
-          item.file_url;
+        this.link_pdf = "http://liveh5.canpoint.net/" + item.file_url;
       }
     },
     getDataList() {
@@ -93,12 +97,12 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-section ul li > object > a > div > div span {
+section ul li > a > div > div span {
   color: #ee7428;
   font-size: 18px;
   margin-right: 50px;
 }
-section ul li > object > a > div > div {
+section ul li > a > div > div {
   border-top: 1px solid rgba(241, 241, 241, 1);
   position: absolute;
   bottom: 0;
@@ -108,14 +112,14 @@ section ul li > object > a > div > div {
   line-height: 60px;
   text-align: right;
 }
-section ul li > object > a > div > span {
+section ul li > a > div > span {
   color: #999;
   margin-top: 18px;
   font-size: 0.24rem;
   margin-left: 0.133333rem;
   display: inline-block;
 }
-section ul li > object > a > div p {
+section ul li > a > div p {
   color: #333;
   display: flex;
   align-items: center;
@@ -126,7 +130,7 @@ section ul li > object > a > div p {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-section ul li > object > a > div p span.title {
+section ul li > a > div p span.title {
   display: inline-block;
   background: #ee7428;
   color: #fff;
@@ -137,8 +141,13 @@ section ul li > object > a > div p span.title {
   line-height: 0.43rem;
   text-align: center;
 }
-section ul li > object > a > div {
+section ul li > a > div {
   margin: 10px 18px;
+}
+section ul li > a {
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 section ul li:last-child {
   margin-bottom: 40px;

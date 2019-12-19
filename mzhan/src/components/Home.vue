@@ -51,7 +51,7 @@
           <li @click="goXiangqing(item.id)" v-for="(item,i) in product_subject">
             <div class="title">
               <div class="title-top">
-                <span class="tag">{{item.subject == 1? "数学" : "英语"}}</span>
+                <span class="tag">{{item.subject}}</span>
                 <span class="classify">{{item.course_name}}</span>
               </div>
               <div class="titledown">
@@ -136,7 +136,7 @@
           <li @click="goXiangqing(item.id)" v-for="(item,i) in product_video">
             <div class="title">
               <div class="title-top">
-                <span class="tag">{{item.subject == 1? "数学" : "英语"}}</span>
+                <span class="tag">{{item.subject}}</span>
                 <span class="classify">{{item.course_name}}</span>
               </div>
               <div class="titledown">
@@ -165,7 +165,7 @@
                 rel="nofollow"
               >
                 <span class="datum-class">
-                  <span>{{item.subject == 1? "数学":"英语"}}</span>
+                  <span>{{item.subject}}</span>
                   {{item.materials_name}}
                 </span>
                 <span class="empty"></span>
