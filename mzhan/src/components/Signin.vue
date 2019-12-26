@@ -5,45 +5,35 @@
       <img class="login" src="../assets/img/login5.png" alt />
     </header>
     <section>
-      <div class="tab">
-        <p :class="{active: tab == 1}" @click="setTab(1)">
-          <span>验证码登录</span>
-          <i style="width:70px;"></i>
-        </p>
-        <p :class="{active: tab == 2}" @click="setTab(2)">
-          <span>密码登录</span>
-          <i style="width:55px;"></i>
-        </p>
-      </div>
-      <ul v-if=" tab == 1">
+      <ul>
         <li>
-          <input v-model="form.mobile" type="text" placeholder="请输入手机号" />
+          <input v-model="form.mobile" type="text" placeholder="手机号" />
         </li>
         <li>
-          <input v-model="form.password" type="text" placeholder="请输入验证码" />
+          <input v-model="form.passwordOne" type="password" placeholder="密码" />
+        </li>
+        <li>
+          <input v-model="form.passwordTow" type="password" placeholder="再次确认密码" />
+        </li>
+        <li>
+          <input v-model="form.password" type="text" placeholder="短信验证码" />
           <span @click="sion" v-if="isSion">{{text}}</span>
           <span v-else>获取验证码({{num}})</span>
         </li>
       </ul>
-      <ul v-if=" tab == 2">
-        <li>
-          <input v-model="form.mobile" type="text" placeholder="请输入手机号" />
-        </li>
-        <li>
-          <input v-model="form.password" type="text" placeholder="请输入密码" />
-          <span>忘记密码?</span>
-        </li>
-      </ul>
       <div class="text">
         <input class="checkbox" type="checkbox" v-model="isChecked" />
-        <span style="flex:1;" @click="showText">《全品学堂用户协议》</span>
-        <span @click="goSignin" class="node">
-          没有账号?
-          <span style="color:#238ACB;">立即注册</span>
+        <span style="flex:1;color:#999;" @click="showText">
+          注册即同意
+          <span style="color:#238ACB;">《用户协议》</span>
+        </span>
+        <span style="color:#999;">
+          已有账号?
+          <span style="color:#238ACB;" @click="goLogin">立即登陆</span>
         </span>
       </div>
       <div class="btn" @click="login">
-        <span>登录</span>
+        <span>注册</span>
         <img src="../assets/img/login4.png" alt />
       </div>
     </section>
@@ -296,7 +286,7 @@
 <script>
 import axios from "axios";
 import storage from "../uilt/storage";
-import { SEND, LOGIN, REPID, PASSOWRD } from "../uilt/url";
+import { SEND, SIGNIN, SIGNINS } from "../uilt/url";
 import { mapMutations } from "vuex";
 export default {
   mounted() {
@@ -308,24 +298,25 @@ export default {
   },
   data() {
     return {
-      tab: 1,
       location: "",
       isChecked: true,
       isModel: false,
       isSion: true,
       text: "发送验证码",
       num: 100,
-      form: {},
+      form: {
+        password: "",
+        passwordOne: "",
+        passwordTow: "",
+        mobile: ""
+      },
       myreg: /^[1][3,4,5,7,8,6,9][0-9]{9}$/
     };
   },
   methods: {
     ...mapMutations(["steGiweStatus"]),
-    setTab(num) {
-      this.tab = num;
-    },
-    goSignin() {
-      this.$router.push("/signin");
+    goLogin() {
+      this.$router.push("/login");
     },
     //关闭协议
     close() {
@@ -336,7 +327,6 @@ export default {
     },
     //发送验证码
     sendCode() {
-      this.form.password = "";
       axios({
         method: "post",
         url: SEND,
@@ -374,64 +364,29 @@ export default {
         this.$notify({ type: "warning", message: "请认真阅读协议" });
         return;
       }
-      if (this.tab == 1) {
-        axios({
-          method: "post",
-          url: REPID,
-          data: {
-            mobile: this.form.mobile,
-            password: this.form.password
+      axios({
+        method: "post",
+        url: SIGNINS,
+        data: {
+          mobile: this.form.mobile,
+          password: this.form.password,
+          mobile_password: this.form.passwordTow,
+          promoter_id: this.location ? this.location : ""
+        }
+      })
+        .then(res => {
+          if (res.data.error) {
+            this.$notify({ type: "warning", message: res.data.error });
+            return;
+          }
+          if (res.data.ret) {
+						this.$notify({ type: "success", message: "注册成功！" });
+						this.$router.push('/login')
           }
         })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(e => {
-            console.error(e);
-          });
-      } else {
-        axios({
-          method: "post",
-          url: PASSOWRD,
-          data: {
-            mobile: this.form.mobile,
-            mobile_password: this.form.password
-          }
-        })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(e => {
-            console.error(e);
-          });
-      }
-      // axios({
-      //   method: "post",
-      //   url: LOGIN,
-      //   data: {
-      //     mobile: this.form.mobile,
-      //     password: this.form.password,
-      //     promoter_id: this.location ? this.location : ""
-      //   }
-      // })
-      //   .then(res => {
-      //     if (res.data.error) {
-      //       this.$notify({ type: "warning", message: res.data.error });
-      //       return;
-      //     }
-      //     if (res.data.code == 200 && res.data.ret == true) {
-      //       if (res.data.data.is_sign == 2) {
-      //         this.$router.push("/classify");
-      //       }
-      //       this.$notify({ type: "success", message: "登录成功" });
-      //       storage.saveToken(res.data.data.token);
-      //       storage.saveDraw(res.data.data.give_status);
-      //       this.$router.push("/home");
-      //     }
-      //   })
-      //   .catch(e => {
-      //     console.error(e);
-      //   });
+        .catch(e => {
+          console.error(e);
+        });
     },
     login() {
       this.Login();
@@ -440,55 +395,82 @@ export default {
       if (!this.form.mobile || !this.myreg.test(this.form.mobile)) {
         this.$notify({ type: "warning", message: "请填写正确的手机号码" });
         return;
+      } else if (!this.form.passwordOne || !this.form.passwordTow) {
+        this.$notify({ type: "warning", message: "密码不能为空" });
+        return;
+      } else if (this.form.passwordOne != this.form.passwordTow) {
+        this.$notify({ type: "warning", message: "两次密码不同" });
+        return;
+      } else if (this.checkPwd(this.form.passwordOne) == "no") {
+        return;
       }
-      this.sendCode();
-      this.isSion = false;
-      if (!this.isSion) {
-        --this.num;
-        let set = window.setInterval(() => {
-          if (this.num-- <= 1) {
-            this.num = 100;
-            window.clearInterval(set);
-            this.isSion = true;
+      axios({
+        method: "post",
+        url: SIGNIN,
+        data: {
+          mobile: this.form.mobile
+        }
+      })
+        .then(res => {
+          console.log(res);
+          if (res.data.ret) {
+            this.$notify({
+              type: "warning",
+              message: "您已注册，请直接登陆"
+            });
+            return;
+          } else {
+            this.sendCode();
+            this.isSion = false;
+            if (!this.isSion) {
+              --this.num;
+              let set = window.setInterval(() => {
+                if (this.num-- <= 1) {
+                  this.num = 100;
+                  window.clearInterval(set);
+                  this.isSion = true;
+                }
+              }, 1000);
+            }
           }
-        }, 1000);
+        })
+        .catch(e => {
+          console.error(e);
+        });
+    },
+    //校验密码
+    checkPwd(str) {
+      var patrn = /[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘'，。、]/im;
+      var pattern4 = /\s+/g;
+      if (pattern4.exec(str)) {
+        this.$notify({
+          type: "warning",
+          message: "不能有空格、换行、tab缩进等所有的空白"
+        });
+        return "no";
       }
+      if (patrn.test(str)) {
+        this.$notify({ type: "warning", message: "不可用特殊字符" });
+        return "no";
+      } else {
+        if (str.length < 6) {
+          this.$notify({ type: "warning", message: "密码不能小于6位" });
+          return "no";
+        }
+        if (!str) {
+          this.$notify({ type: "warning", message: "密码不能为空" });
+          return "no";
+        }
+      }
+      return "ok";
     }
   }
 };
 </script>
 
 <style scoped>
-.tab > p.active > span {
-  color: #333;
-}
-.tab > p.active > i {
-  background: #ff6600;
-}
-.tab > p > i {
-  width: 50px;
-  height: 3px;
-}
-.tab > p {
-  font-size: 28px;
-  flex: 1;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #999;
-}
-.tab {
-  width: 7.306667rem;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 40px;
-}
 .text .node {
-  color: #999;
+  color: #238acb;
   font-size: 24px;
 }
 header .bei {
@@ -510,8 +492,8 @@ header .bei {
 .colse {
   font-size: 50px;
   position: fixed;
-  top: 90px;
-  right: 36px;
+  top: 1.7rem;
+  right: 1.1rem;
   z-index: 99999;
 }
 .van-overlay {
@@ -524,8 +506,7 @@ header .bei {
   height: 14rem;
   width: 100%;
   background: #fff;
-  margin: 30px;
-  padding: 1rem;
+  margin: 60px 80px;
 }
 section > div.text > span {
   font-size: 24px;
@@ -552,10 +533,9 @@ section > div.btn {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 50px;
 }
 section > ul {
-  margin-top: 20px;
+  margin-top: 40px;
 }
 ul li > span {
   position: absolute;

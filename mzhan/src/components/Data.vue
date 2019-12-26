@@ -63,9 +63,9 @@ export default {
         item.file_url.split(".")[1] == "doc" ||
         item.file_url.split(".")[1] == "docx"
       ) {
-        this.link_word = "http://liveh5.canpoint.net/" + item.file_url;
+        this.link_word = "http://liveapi.canpoint.net/" + item.file_url;
       } else {
-        this.link_pdf = "http://liveh5.canpoint.net/" + item.file_url;
+        this.link_pdf = "http://liveapi.canpoint.net/" + item.file_url;
       }
     },
     getDataList() {

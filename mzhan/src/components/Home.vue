@@ -26,15 +26,15 @@
           <ul>
             <li @click="goCourse">
               <img src="../assets/img/shu.png" alt />
-              <span>课程</span>
+              <span>选课中心</span>
             </li>
             <li @click="goSmall">
               <img src="../assets/img/wei.png" alt />
-              <span>微课</span>
+              <span>免费课程</span>
             </li>
             <li @click="goData">
               <img src="../assets/img/liao.png" alt />
-              <span>资料</span>
+              <span>考试题库</span>
             </li>
             <li @click="goPar">
               <img src="../assets/img/ge.png" alt />
@@ -85,10 +85,11 @@
         <!-- 教学实力 -->
         <div class="teaching">
           <div class="selected-header">
-            <span>公司介绍</span>
+            <span>为什么选择全品学堂</span>
             <p></p>
           </div>
-          <div class="teaching-user">
+          <img src="../assets/img/shizi.png" alt="">
+          <!-- <div class="teaching-user">
             <p>四大优势 成就高分</p>
             <p style="font-size:12px;">让学校课上的每1分钟，都得到100%的融会贯通。</p>
           </div>
@@ -129,7 +130,7 @@
             <li>
               <span>综合评价学员的学习进度表现，从巩固基础到突破高分，提供针对性的学习方案。</span>
             </li>
-          </ul>
+          </ul> -->
         </div>
         <!-- 微课 -->
         <ul class="class weiclass">
@@ -178,26 +179,24 @@
         <div class="promise">
           <div class="selected-header">
             <span>我们承诺</span>
+            <p></p>
           </div>
           <div class="promise-content">
             <ul>
               <li>
                 <img src="../assets/img/er.png" alt />
-                <p>免费试听，满意再报名</p>
-                <div>0元领取精品课，学科年级任选，</div>
-                <div>体验 满意再报名</div>
+                <p>先体验后报名</p>
+                <div>效果不放心？尽情体验再报名</div>
               </li>
               <li>
                 <img src="../assets/img/shua.png" alt />
-                <p>免费试听，满意再报名</p>
-                <div>0元领取精品课，学科年级任选，</div>
-                <div>体验 满意再报名</div>
+                <p>4V1 服务体系</p>
+                <div>课前-课中-课后，全程保障体验</div>
               </li>
               <li>
                 <img src="../assets/img/qian.png" alt />
-                <p>免费试听，满意再报名</p>
-                <div>0元领取精品课，学科年级任选，</div>
-                <div>体验 满意再报名</div>
+                <p>一年无限回放</p>
+                <div>课程购买后，一年内可无限回放</div>
               </li>
             </ul>
           </div>
@@ -249,7 +248,7 @@ export default {
         storage.clear();
         return;
       }else{
-        this.link ="https://view.officeapps.live.com/op/view.aspx?src=" +'http://liveapi.canpoint.net/'+url
+        this.link ='http://liveapi.canpoint.net/'+url
       }
     },
     //资料
@@ -309,7 +308,7 @@ export default {
     },
     goXiangqing(item) {
       storage.save(item);
-      this.$router.push("/databank");
+      this.$router.push({path:`/databank/${item}`});
     },
     //登陆
     goLogin() {
@@ -483,7 +482,7 @@ footer div {
   background: #fd6122;
   width: 0.44rem;
 }
-.teaching > ul > li > span > span {
+/* .teaching > ul > li > span > span {
   color: #ff4900;
 }
 .teaching > ul > li:nth-of-type(even) {
@@ -506,9 +505,12 @@ footer div {
 .teaching > ul > li > img {
   width: 20px;
   height: 20px;
+} */
+.teaching > img{
+  width: 101%;
 }
 .teaching {
-  height: 11rem;
+  height: 1062px;
   display: flex;
   justify-content: center;
   align-items: center;

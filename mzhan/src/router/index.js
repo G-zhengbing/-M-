@@ -11,6 +11,7 @@ import Special from '@/components/Special'
 import Login from '@/components/Login'
 import Classify from '@/components/Classify'
 import Data from '@/components/Data'
+import Signin from '@/components/Signin'
 import storage from '../uilt/storage'
 
 Vue.use(Router)
@@ -19,8 +20,6 @@ const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err)
 }
-
-
 
 const router = new Router({
   routes: [{
@@ -34,11 +33,16 @@ const router = new Router({
       component: Login
     },
     {
+      path: '/signin',
+      name: 'signin',
+      component: Signin
+    },
+    {
       path: "/home",
       component: Home
     },
     {
-      path: "/databank",
+      path: "/databank/:id",
       component: Databank
     },
     {
@@ -81,13 +85,13 @@ const router = new Router({
   ]
 })
 
-router.beforeEach((to, form, next) => {
-  var arr = ['/login']
-  if (arr.includes(to.path) || JSON.stringify(storage.getToken()) != '{}') {
-    next()
-    return
-  } else {
-    return next('/login')
-  }
-})
+// router.beforeEach((to, form, next) => {
+//   var arr = ['/login']
+//   if (arr.includes(to.path) || JSON.stringify(storage.getToken()) != '{}') {
+//     next()
+//     return
+//   } else {
+//     return next('/login')
+//   }
+// })
 export default router

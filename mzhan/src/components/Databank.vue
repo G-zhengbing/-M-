@@ -61,12 +61,26 @@
       </footer>
     </scroller>
     <div class="btn">
-      <img src="../assets/img/ke.png" alt />
+      <img @click="showKefu" src="../assets/img/ke.png" alt />
       <p>
         <span class="bao" @click="isLogin">免费领取</span>
         <span class="ling" @click="goOrder">立即报名</span>
       </p>
     </div>
+    <!-- 客服 -->
+    <van-overlay :show="isKefu">
+      <div class="block">
+        <p class="alert">温馨提示</p>
+        <div>
+          <p class="title">
+            客服电话 :
+            <input id="span" @click="clone" value="18519308092" readonly />
+          </p>
+          <span>*有任何问题可联系我们的客服</span>
+        </div>
+        <p class="confirm" @click="close">确定</p>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
@@ -77,7 +91,8 @@ import { DRAW, GETDRAW, ISGETDRAW, DATALISTS } from "../uilt/url";
 export default {
   data() {
     return {
-      item: storage.get(),
+      isKefu: false,
+      item: this.$route.params.id ? this.$route.params.id : storage.get(),
       obj: {
         pic: []
       }
@@ -90,6 +105,17 @@ export default {
     document.documentElement.scrollTop = 0;
   },
   methods: {
+    clone() {
+      let link = document.getElementById("span");
+      link.select();
+      document.execCommand("Copy");
+    },
+    close() {
+      this.isKefu = false;
+    },
+    showKefu() {
+      this.isKefu = true;
+    },
     //获取当前商品信息
     getList() {
       return new Promise((resolve, reject) => {
@@ -129,6 +155,11 @@ export default {
     },
     //是否免费领取
     getDraw() {
+      if (JSON.stringify(storage.getToken()) == "{}") {
+        this.$router.push("/login");
+        storage.clear();
+        return;
+      }
       return new Promise((resolve, reject) => {
         axios({
           method: "get",
@@ -183,6 +214,56 @@ export default {
 </script>
 
 <style scoped>
+.block > div > p > input {
+  color: #1989fa;
+  border: none;
+  outline: none;
+  width: 180px;
+}
+.block > div > span {
+  color: #a5a4a4;
+  font-size: 13px;
+}
+.block .confirm {
+  height: 60px;
+  border-top: 1px solid #ccc;
+  color: #1989fa;
+  line-height: 60px;
+  font-size: 32px;
+}
+.block > div {
+  flex: 1;
+  color: #646566;
+}
+.block .alert {
+  margin: 12px 0;
+  font-size: 32px;
+}
+.block .title {
+  font-size: 28px;
+  color: #333;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  height: 80px;
+  line-height: 80px;
+  display: flex;
+  justify-content: center;
+}
+.block {
+  width: 6rem;
+  height: 4rem;
+  background: #fff;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.van-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 .content {
   height: 100%;
 }
