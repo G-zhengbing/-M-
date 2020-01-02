@@ -7,7 +7,7 @@ import store from './store/index'
 import Vant from 'vant'
 import 'vant/lib/index.css'
 import 'lib-flexible/flexible'
-// import './uilt/http/index'
+import './uilt/http/index'
 import VueScroller from "vue-scroller"
 Vue.use(VueScroller);
 

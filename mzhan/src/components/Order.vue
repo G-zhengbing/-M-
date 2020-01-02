@@ -1,21 +1,15 @@
 <template>
   <div class="box">
-    <!-- <header>
-      <a href="javascript:;">
-        <img src="../assets/img/fan.png" alt />
-      </a>
-      <span>确认订单</span>
-    </header> -->
     <section>
       <div class="contanner">
         <ul class="order-form">
           <li>
             <div>
               <div>
-                <span>数学</span>
-                <p>【秋(下)】初一数学直播勤学班</p>
+                <span>{{list.subject}}</span>
+                <p>{{list.course_name}}</p>
               </div>
-              <p>10月7日-12月28日每周六18：20-20：30</p>
+              <p>{{list.start_date}} - {{list.end_date}}</p>
             </div>
           </li>
         </ul>
@@ -23,15 +17,16 @@
           <div>
             <div class="trade-money">
               <i>商品金额</i>
-              <span>￥888.00</span>
+              <span>￥{{list.sale_price}}</span>
             </div>
             <div class="privilege-money">
               <i>优惠金额</i>
-              <span>￥0</span>
+              <span>￥{{list.activity_price}}</span>
             </div>
             <div class="true-money">
               <p>
-                <span>共1件,总价:</span>￥888.00
+                <span>共1件,总价:</span>
+                ￥{{list.activity_price}}
               </p>
             </div>
           </div>
@@ -40,29 +35,163 @@
     </section>
     <footer>
       <p>
-        <span>共{{2}}件,订单总价:</span>￥888.00
+        <span>共1件,订单总价:</span>
+        ￥{{list.activity_price}}
       </p>
-      <span>立即支付</span>
+      <span @click="goOrder">立即支付</span>
     </footer>
+    <van-overlay :show="isOrder">
+      <div class="block">
+        <div>
+          <img :src="html" alt="">
+          <i>*请长按识别二维码支付</i>
+          <p @click="close">×</p>
+        </div>
+      </div>
+    </van-overlay>
+    <Loading v-show="showLoading" />
   </div>
 </template>
 
 <script>
+import Loading from '../uilt/loading/Loading' 
+import { DATALISTS, ORDER } from "../uilt/url";
+import storage from "../uilt/storage";
+import axios from "axios";
 export default {
-	mounted(){
-	},
-  watch: {
-    $route(to, from) {
+  components:{
+    Loading
+  },
+  data() {
+    return {
+      showLoading:false,
+      isOrder: false,
+      list: [],
+      orders: [],
+      item: this.$route.params.id,
+      html: ""
+    };
+  },
+  mounted() {
+    this.showLoading = true
+    this.getOrderList().then(()=>{
+      this.showLoading = false
+    });
+  },
+  methods: {
+    close() {
+      this.isOrder = false;
+    },
+    //支付
+    goOrder() {
+      if (JSON.stringify(storage.getToken()) == "{}") {
+        this.$router.push("/login");
+        storage.clear();
+        return;
+      }
+      this.showLoading = true
+      if (this.$route.params.order_sn) {
+        return new Promise((resolve, reject) => {
+          axios({
+            method: "get",
+            url:
+              ORDER +
+              "?product_id=" +
+              this.list.id +
+              "&order_sn=" +
+              this.$route.params.order_sn,
+            headers: {
+              Authorization: "bearer" + storage.getToken()
+            }
+          })
+            .then(res => {
+              this.showLoading = false
+              this.html = res.data.data.qrcode;
+              this.isOrder = true;
+              resolve();
+            })
+            .catch(e => {
+              this.showLoading = false
+              reject(e);
+            });
+        });
+      } else {
+        return new Promise((resolve, reject) => {
+          axios({
+            method: "get",
+            url: ORDER + "?product_id=" + this.list.id,
+            headers: {
+              Authorization: "bearer" + storage.getToken()
+            }
+          })
+            .then(res => {
+              this.showLoading = false
+              this.html = res.data.data.qrcode;
+              this.isOrder = true;
+              resolve();
+            })
+            .catch(e => {
+              this.showLoading = false
+              reject(e);
+            });
+        });
+      }
+    },
+    getOrderList() {
+      return new Promise((resolve, reject) => {
+        axios({
+          method: "get",
+          url: DATALISTS + "?product_id=" + this.item,
+          headers: {
+            Authorization: "bearer" + storage.getToken()
+          }
+        })
+          .then(res => {
+            this.list = res.data.data;
+            resolve();
+          })
+          .catch(e => {
+            reject(e);
+          });
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-.privilege-money span{
+.block > div > p {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 50px;
+  width: 50px;
+}
+.block > div > i {
+  color: #333;
+  font-size: 28px;
+}
+.block > div {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 480px;
+  height: 480px;
+  background: #fff;
+}
+.block {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.privilege-money span {
   font-size: 26px;
 }
-.trade-money span{
+.trade-money span {
   font-size: 26px;
 }
 .money > div div.true-money p span {

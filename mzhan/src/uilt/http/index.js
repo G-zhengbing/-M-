@@ -29,10 +29,8 @@ Axios.interceptors.response.use(data => {
 }, error => {
   let arr = error.toString().split(" ")
   arr.find(i => {
-    console.log(i)
     if (i == "403") {
-      alert("当前的用户信息已过期，请重新登陆！")
-      window.location.href = "/login"
+      window.location.href = "#/login"
       storeage.clear();
     }
   })

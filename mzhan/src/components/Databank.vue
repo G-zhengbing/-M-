@@ -42,7 +42,7 @@
               <span>{{obj.subject == 1? "数学" : "英语"}}</span>
               &nbsp;&nbsp;&nbsp;{{obj.course_name}}
             </p>
-            <span>{{obj.start_date}} - {{obj.end_date}} 每周{{obj.week_day}} {{obj.start_time}} - {{obj.end_time}}</span>
+            <span>{{obj.start_date}} - {{obj.end_date}}</span>
             <i>￥{{obj.activity_price}}</i>
             <div>服务:正品保证</div>
           </div>
@@ -63,7 +63,7 @@
     <div class="btn">
       <img @click="showKefu" src="../assets/img/ke.png" alt />
       <p>
-        <span class="bao" @click="isLogin">免费领取</span>
+        <span class="bao" @click="isLogin" v-if="obj.type == 2">免费领取</span>
         <span class="ling" @click="goOrder">立即报名</span>
       </p>
     </div>
@@ -74,23 +74,29 @@
         <div>
           <p class="title">
             客服电话 :
-            <input id="span" @click="clone" value="18519308092" readonly />
+            <input id="span" @click="clone" value="010-57121656" readonly />
           </p>
           <span>*有任何问题可联系我们的客服</span>
         </div>
         <p class="confirm" @click="close">确定</p>
       </div>
     </van-overlay>
+    <Loading v-if="showLoading" />
   </div>
 </template>
 
 <script>
+import Loading from "../uilt/loading/Loading";
 import axios from "axios";
 import storage from "../uilt/storage";
 import { DRAW, GETDRAW, ISGETDRAW, DATALISTS } from "../uilt/url";
 export default {
+  components: {
+    Loading
+  },
   data() {
     return {
+      showLoading: false,
       isKefu: false,
       item: this.$route.params.id ? this.$route.params.id : storage.get(),
       obj: {
@@ -99,10 +105,17 @@ export default {
     };
   },
   created() {
-    this.getList();
+    this.showLoading = true;
+    this.getList().then(() => {
+      this.showLoading = false;
+    });
   },
   mounted() {
     document.documentElement.scrollTop = 0;
+    var herf = window.location.href.split("#")[1].split("/");
+    if (herf[1] != "databank" && !herf[2]) {
+      window.location.href += "databank/" + storage.get();
+    }
   },
   methods: {
     clone() {
@@ -160,6 +173,7 @@ export default {
         storage.clear();
         return;
       }
+      this.showLoading = true;
       return new Promise((resolve, reject) => {
         axios({
           method: "get",
@@ -189,25 +203,35 @@ export default {
                         this.$notify({ type: "warning", message: "领取失败" });
                       }
                       resolve();
+                      this.showLoading = false;
                     })
                     .catch(e => {
+                      this.showLoading = false;
                       reject(e);
                     });
                 });
               } else if (res.data.ret) {
                 this.$notify({ type: "warning", message: "已领取过其他微课" });
+                this.showLoading = false;
                 return;
               }
             }
+            this.showLoading = false;
             resolve();
           })
           .catch(e => {
+            this.showLoading = false;
             reject(e);
           });
       });
     },
     goOrder() {
-      // this.$router.push("/order");
+      if (JSON.stringify(storage.getToken()) == "{}") {
+        this.$router.push("/login");
+        storage.clear();
+        return;
+      }
+      this.$router.push({ path: `/order/${this.item}` });
     }
   }
 };
@@ -218,7 +242,7 @@ export default {
   color: #1989fa;
   border: none;
   outline: none;
-  width: 180px;
+  width: 2.8rem;
 }
 .block > div > span {
   color: #a5a4a4;
@@ -236,7 +260,7 @@ export default {
   color: #646566;
 }
 .block .alert {
-  margin: 12px 0;
+  margin: 25px 0;
   font-size: 32px;
 }
 .block .title {

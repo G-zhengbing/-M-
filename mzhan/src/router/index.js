@@ -12,6 +12,8 @@ import Login from '@/components/Login'
 import Classify from '@/components/Classify'
 import Data from '@/components/Data'
 import Signin from '@/components/Signin'
+import Address from '../components/address/Address'
+import Addsite from '../components/address/Addsite'
 import storage from '../uilt/storage'
 
 Vue.use(Router)
@@ -62,7 +64,8 @@ const router = new Router({
       component: PersonageData
     },
     {
-      path: "/order",
+      path: "/order/:id",
+      name:'Order',
       component: Order
     },
     {
@@ -81,6 +84,14 @@ const router = new Router({
     {
       path: "/data",
       component: Data
+    },
+    {
+      path: "/address",
+      component: Address
+    },
+    {
+      path: "/addsite",
+      component: Addsite
     }
   ]
 })

@@ -1,5 +1,6 @@
 <template>
   <div class="box">
+    <scroller style="height:100%;">
     <header>
       <div class="center">
         <img src="../assets/img/ju.png" alt />
@@ -20,11 +21,11 @@
     <section>
       <div class="center">
         <ul>
-          <li @click="getTabar(1)">
+          <li @click="getTabar(1,'order')">
             <img src="../assets/img/dan2.png" alt />
             <span>我的订单</span>
           </li>
-          <li @click="getTabar(2)">
+          <li @click="getTabar(2,'class')">
             <img src="../assets/img/mine2.png" alt />
             <span>我的课表</span>
           </li>
@@ -44,131 +45,131 @@
               <p></p>
             </li>
           </ul>
-          <div class="tab-content">
-            <div v-if="num == 1">
-              <ul>
-                <li v-for="(item,i) in orderList" :key="i">
-                  <div>
-                    <p>
-                      <span>{{item.subject == 1? "数学":"英语"}}</span>
-                      &nbsp;&nbsp;&nbsp;{{item.course_name}}
-                    </p>
-                    <span>{{item.product_time}}</span>
+            <div class="tab-content">
+              <div v-if="num == 1">
+                <ul>
+                  <li v-for="(item,i) in orderList" :key="i">
                     <div>
-                      <!-- 1未支付 2已支付 3已取消 -->
-                      <template v-if="item.status == 1">
+                      <p>
+                        <span>{{item.subject}}</span>
+                        &nbsp;&nbsp;&nbsp;{{item.course_name}}
+                      </p>
+                      <span>{{item.product_time}}</span>
+                      <div>
+                        <!-- 1未支付 2已支付 3已取消 -->
+                        <template v-if="item.status == 1">
+                          <p>
+                            未支付：
+                            <span>￥{{item.pay_amount}}</span>
+                          </p>
+                          <span>
+                            <span @click="goOrder(item)">立即支付</span>
+                          </span>
+                        </template>
+                        <template v-if="item.status == 2">
+                          <p>
+                            已支付：
+                            <span>￥{{item.pay_amount}}</span>
+                          </p>
+                        </template>
+                        <template v-if="item.status == 3">
+                          <p>已取消</p>
+                        </template>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <div class="empty" v-if="orderList.length !=0">
+                  <p>
+                    <img src="../assets/img/pie4 (2).png" alt />
+                    <span>没有更多了</span>
+                    <img src="../assets/img/pie4 (1).png" alt />
+                  </p>
+                </div>
+                <div class="empty orderAll" v-if="orderList.length == 0">
+                  <img src="../assets/img/ding2.png" alt />
+                  <span>暂无订单</span>
+                </div>
+              </div>
+              <div v-if="num == 2">
+                <ul>
+                  <li v-for="(item,i) in orderList" :key="i">
+                    <div>
+                      <p>
+                        <span>{{item.subject}}</span>
+                        &nbsp;&nbsp;&nbsp;{{item.course_name}}
+                      </p>
+                      <span>{{item.product_time}}</span>
+                      <div>
                         <p>
-                          未支付：
+                          应付款：
                           <span>￥{{item.pay_amount}}</span>
                         </p>
                         <span>
-                          <span @click="goOrder">立即支付</span>
+                          <span @click="goOrder(item)">立即支付</span>
                         </span>
-                      </template>
-                      <template v-if="item.status == 2">
-                        <p>
-                          已支付：
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <div class="empty" v-if="orderList.length !=0">
+                  <p>
+                    <img src="../assets/img/pie4 (2).png" alt />
+                    <span>没有更多了</span>
+                    <img src="../assets/img/pie4 (1).png" alt />
+                  </p>
+                </div>
+                <div class="empty orderAll" v-if="orderList.length == 0">
+                  <img src="../assets/img/ding2.png" alt />
+                  <span>暂无订单</span>
+                </div>
+              </div>
+              <div v-if="num == 3">
+                <ul>
+                  <li v-for="(item,i) in orderList" :key="i">
+                    <div>
+                      <p>
+                        <span>{{item.subject}}</span>
+                        &nbsp;&nbsp;&nbsp;{{item.course_name}}
+                      </p>
+                      <span>{{item.product_time}}</span>
+                      <div>
+                        <p v-if="!orderList.length>=1">
+                          应付款：
                           <span>￥{{item.pay_amount}}</span>
                         </p>
-                      </template>
-                      <template v-if="item.status == 3">
-                        <p>已取消</p>
-                      </template>
+                        <p>
+                          已付款：
+                          <span>￥{{item.pay_amount}}</span>
+                        </p>
+                        <span v-if="!orderList.length>=1">
+                          <span @click="goOrder(item)">立即支付</span>
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
-              <div class="empty" v-if="orderList.length !=0">
-                <p>
-                  <img src="../assets/img/pie4 (2).png" alt />
-                  <span>没有更多了</span>
-                  <img src="../assets/img/pie4 (1).png" alt />
-                </p>
-              </div>
-              <div class="empty orderAll" v-if="orderList.length == 0">
-                <img src="../assets/img/ding2.png" alt />
-                <span>暂无订单</span>
+                  </li>
+                </ul>
+                <div class="empty" v-if="orderList.length !=0">
+                  <p>
+                    <img src="../assets/img/pie4 (2).png" alt />
+                    <span>没有更多了</span>
+                    <img src="../assets/img/pie4 (1).png" alt />
+                  </p>
+                </div>
+                <div class="empty orderAll" v-if="orderList.length == 0">
+                  <img src="../assets/img/ding2.png" alt />
+                  <span>暂无订单</span>
+                </div>
               </div>
             </div>
-            <div v-if="num == 2">
-              <ul>
-                <li v-for="(item,i) in orderList" :key="i">
-                  <div>
-                    <p>
-                      <span>{{item.subject == 1? "数学":"英语"}}</span>
-                      &nbsp;&nbsp;&nbsp;{{item.course_name}}
-                    </p>
-                    <span>{{item.product_time}}</span>
-                    <div>
-                      <p>
-                        应付款：
-                        <span>￥{{item.pay_amount}}</span>
-                      </p>
-                      <span>
-                        <span @click="goOrder">立即支付</span>
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              <div class="empty" v-if="orderList.length !=0">
-                <p>
-                  <img src="../assets/img/pie4 (2).png" alt />
-                  <span>没有更多了</span>
-                  <img src="../assets/img/pie4 (1).png" alt />
-                </p>
-              </div>
-              <div class="empty orderAll" v-if="orderList.length == 0">
-                <img src="../assets/img/ding2.png" alt />
-                <span>暂无订单</span>
-              </div>
-            </div>
-            <div v-if="num == 3">
-              <ul>
-                <li v-for="(item,i) in orderList" :key="i">
-                  <div>
-                    <p>
-                      <span>{{item.subject == 1? "数学":"英语"}}</span>
-                      &nbsp;&nbsp;&nbsp;{{item.course_name}}
-                    </p>
-                    <span>{{item.product_time}}</span>
-                    <div>
-                      <p v-if="!orderList.length>=1">
-                        应付款：
-                        <span>￥{{item.pay_amount}}</span>
-                      </p>
-                      <p>
-                        已付款：
-                        <span>￥{{item.pay_amount}}</span>
-                      </p>
-                      <span v-if="!orderList.length>=1">
-                        <span @click="goOrder">立即支付</span>
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              <div class="empty" v-if="orderList.length !=0">
-                <p>
-                  <img src="../assets/img/pie4 (2).png" alt />
-                  <span>没有更多了</span>
-                  <img src="../assets/img/pie4 (1).png" alt />
-                </p>
-              </div>
-              <div class="empty orderAll" v-if="orderList.length == 0">
-                <img src="../assets/img/ding2.png" alt />
-                <span>暂无订单</span>
-              </div>
-            </div>
-          </div>
         </div>
         <div class="class-list" v-if="tabar == 2">
           <ul v-if="orderList.length !=0">
             <li v-for="(item,i) in orderList">
               <p>{{item.course_name}}</p>
-               <span>{{item.product_time}}</span>
+              <span>{{item.product_time}}</span>
               <div>
-                <i>{{item.subject == 1? "数学":"英语"}}</i>
+                <i>{{item.subject}}</i>
                 <div>
                   <span>进入教室</span>
                   <img src="../assets/img/fan.png" alt />
@@ -190,20 +191,32 @@
         </div>
       </div>
     </section>
+    </scroller>
+    <Loading v-if="showLoading"/>
   </div>
 </template>
 
 <script>
+import Loading from '../uilt/loading/Loading'
 import storage from "../uilt/storage";
 import { ORDER_LIST, UESR_DATA } from "../uilt/url";
 import axios from "axios";
 export default {
+  components:{
+    Loading
+  },
   mounted() {
-    this.getOrderList();
-    this.getUserList();
+    this.showLoading = true
+    this.getOrderList().then(()=>{
+      this.showLoading = false
+    });
+    this.getUserList().then(()=>{
+      this.showLoading = false
+    });
   },
   data() {
     return {
+      showLoading:false,
       num: 1,
       tabar: 1,
       orderList: [],
@@ -231,8 +244,11 @@ export default {
       });
     },
     //支付
-    goOrder() {
-      this.$router.push("/order");
+    goOrder(item) {
+      this.$router.push({
+        name: "Order",
+        params: { id: item.product_id, order_sn: item.order_sn }
+      });
     },
     //订单课程列表(全部)
     getOrderList(num) {
@@ -255,10 +271,12 @@ export default {
           }
         })
           .then(res => {
+           this.showLoading = false
             this.orderList = res.data.data.data;
             resolve();
           })
           .catch(e => {
+            this.showLoading = false
             reject(e);
           });
       });
@@ -280,11 +298,18 @@ export default {
       }
       this.$router.push("/personagedata");
     },
-    getTabar(num) {
+    getTabar(num, type) {
+      this.showLoading = true
       this.tabar = num;
-      this.getOrderList(3);
+      if (type == "class") {
+        this.getOrderList(3);
+      } else {
+        this.num = 1;
+        this.getOrderList(num);
+      }
     },
     setTabs(num) {
+      this.showLoading = true
       this.num = num;
       this.getOrderList(num);
     }
@@ -293,6 +318,9 @@ export default {
 </script>
 
 <style scoped>
+div._v-container>div._v-content{
+  height: 100%!important;
+}
 .head {
   border-radius: 50%;
 }
@@ -366,6 +394,7 @@ export default {
 .empty > span {
   color: #333;
   font-size: 25px;
+  margin: 0 0 100px 0;
 }
 .empty > p {
   color: #333;

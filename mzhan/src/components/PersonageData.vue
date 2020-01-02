@@ -70,6 +70,12 @@
               <img class="go" src="../assets/img/fan.png" alt />
             </div>
           </li>
+          <li @click="goAddress">
+            <span>收货地址</span>
+            <div>
+              <img class="go" src="../assets/img/fan.png" alt />
+            </div>
+          </li>
         </ul>
       </div>
     </section>
@@ -148,6 +154,9 @@ export default {
     this.sharePoster();
   },
   methods: {
+    goAddress(){
+      this.$router.push('/address')
+    },
     saveFile() {
       if (this.images.length == 0) {
         this.$notify({ type: "warning", message: "请选择要上传的头像" });

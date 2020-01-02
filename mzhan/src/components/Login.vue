@@ -5,7 +5,7 @@
       <img class="login" src="../assets/img/login5.png" alt />
     </header>
     <section>
-      <div class="tab">
+      <!-- <div class="tab">
         <p :class="{active: tab == 1}" @click="setTab(1)">
           <span>验证码登录</span>
           <i style="width:70px;"></i>
@@ -14,7 +14,7 @@
           <span>密码登录</span>
           <i style="width:55px;"></i>
         </p>
-      </div>
+      </div> -->
       <ul v-if=" tab == 1">
         <li>
           <input v-model="form.mobile" type="text" placeholder="请输入手机号" />
@@ -37,10 +37,10 @@
       <div class="text">
         <input class="checkbox" type="checkbox" v-model="isChecked" />
         <span style="flex:1;" @click="showText">《全品学堂用户协议》</span>
-        <span @click="goSignin" class="node">
+        <!-- <span @click="goSignin" class="node">
           没有账号?
           <span style="color:#238ACB;">立即注册</span>
-        </span>
+        </span> -->
       </div>
       <div class="btn" @click="login">
         <span>登录</span>
@@ -374,64 +374,64 @@ export default {
         this.$notify({ type: "warning", message: "请认真阅读协议" });
         return;
       }
-      if (this.tab == 1) {
-        axios({
-          method: "post",
-          url: REPID,
-          data: {
-            mobile: this.form.mobile,
-            password: this.form.password
-          }
-        })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(e => {
-            console.error(e);
-          });
-      } else {
-        axios({
-          method: "post",
-          url: PASSOWRD,
-          data: {
-            mobile: this.form.mobile,
-            mobile_password: this.form.password
-          }
-        })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(e => {
-            console.error(e);
-          });
-      }
-      // axios({
-      //   method: "post",
-      //   url: LOGIN,
-      //   data: {
-      //     mobile: this.form.mobile,
-      //     password: this.form.password,
-      //     promoter_id: this.location ? this.location : ""
-      //   }
-      // })
-      //   .then(res => {
-      //     if (res.data.error) {
-      //       this.$notify({ type: "warning", message: res.data.error });
-      //       return;
-      //     }
-      //     if (res.data.code == 200 && res.data.ret == true) {
-      //       if (res.data.data.is_sign == 2) {
-      //         this.$router.push("/classify");
-      //       }
-      //       this.$notify({ type: "success", message: "登录成功" });
-      //       storage.saveToken(res.data.data.token);
-      //       storage.saveDraw(res.data.data.give_status);
-      //       this.$router.push("/home");
+      // if (this.tab == 1) {
+      //   axios({
+      //     method: "post",
+      //     url: REPID,
+      //     data: {
+      //       mobile: this.form.mobile,
+      //       password: this.form.password
       //     }
       //   })
-      //   .catch(e => {
-      //     console.error(e);
-      //   });
+      //     .then(res => {
+      //       console.log(res);
+      //     })
+      //     .catch(e => {
+      //       console.error(e);
+      //     });
+      // } else {
+      //   axios({
+      //     method: "post",
+      //     url: PASSOWRD,
+      //     data: {
+      //       mobile: this.form.mobile,
+      //       mobile_password: this.form.password
+      //     }
+      //   })
+      //     .then(res => {
+      //       console.log(res);
+      //     })
+      //     .catch(e => {
+      //       console.error(e);
+      //     });
+      // }
+      axios({
+        method: "post",
+        url: LOGIN,
+        data: {
+          mobile: this.form.mobile,
+          password: this.form.password,
+          promoter_id: this.location ? this.location : ""
+        }
+      })
+        .then(res => {
+          if (res.data.error) {
+            this.$notify({ type: "warning", message: res.data.error });
+            return;
+          }
+          if (res.data.code == 200 && res.data.ret == true) {
+            if (res.data.data.is_sign == 2) {
+              this.$router.push("/classify");
+            }
+            this.$notify({ type: "success", message: "登录成功" });
+            storage.saveToken(res.data.data.token);
+            storage.saveDraw(res.data.data.give_status);
+            this.$router.push("/home");
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        });
     },
     login() {
       this.Login();
@@ -492,7 +492,7 @@ export default {
   font-size: 24px;
 }
 header .bei {
-  margin-top: -340px;
+  margin-top: -380px;
   width: 100%;
   position: relative;
 }
@@ -603,7 +603,7 @@ header img.login {
   transform: scale(0.45);
 }
 header {
-  height: 9.826667rem;
+  height: 9.2rem;
   overflow: hidden;
   /* position: relative; */
   width: 100%;

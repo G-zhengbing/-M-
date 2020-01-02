@@ -4,7 +4,7 @@
       <img class="back" src="../assets/img/ju.png" alt />
       <img class="logo" src="../assets/img/logo.png" alt />
     </header>
-    <section>
+    <section :class="{islogin:isSignin}">
       <div class="center">
         <van-swipe
           :show-indicators="true"
@@ -55,8 +55,8 @@
                 <span class="classify">{{item.course_name}}</span>
               </div>
               <div class="titledown">
-                <p class="date">{{item.start_date}} - {{item.end_date}} 周{{item.week_day}}</p>
-                <p class="time">{{item.start_time}} - {{item.end_time}}</p>
+                <p class="date">{{item.start_date}} - {{item.end_date}}</p>
+                <!-- <p class="time">{{item.start_time}} - {{item.end_time}}</p> -->
               </div>
             </div>
             <span class="money">
@@ -72,14 +72,9 @@
             <p></p>
           </div>
           <div class="selected-footer">
-            <video
-            ref="video"
-            class="video"
-            preload="auto"
-            controls
-          >
-            <source src="../assets/Mp4.mp4" />
-          </video>
+            <video ref="video" class="video" preload="auto" controls>
+              <source src="../assets/Mp4.mp4" />
+            </video>
           </div>
         </div>
         <!-- 教学实力 -->
@@ -88,7 +83,7 @@
             <span>为什么选择全品学堂</span>
             <p></p>
           </div>
-          <img src="../assets/img/shizi.png" alt="">
+          <img src="../assets/img/shizi.png" alt />
           <!-- <div class="teaching-user">
             <p>四大优势 成就高分</p>
             <p style="font-size:12px;">让学校课上的每1分钟，都得到100%的融会贯通。</p>
@@ -130,7 +125,7 @@
             <li>
               <span>综合评价学员的学习进度表现，从巩固基础到突破高分，提供针对性的学习方案。</span>
             </li>
-          </ul> -->
+          </ul>-->
         </div>
         <!-- 微课 -->
         <ul class="class weiclass">
@@ -141,8 +136,8 @@
                 <span class="classify">{{item.course_name}}</span>
               </div>
               <div class="titledown">
-                <p class="date">{{item.start_date}} - {{item.end_date}} 周{{item.week_day}}</p>
-                <p class="time">{{item.start_time}} - {{item.end_time}}</p>
+                <p class="date">{{item.start_date}} - {{item.end_date}}</p>
+                <!-- <p class="time">{{item.start_time}} - {{item.end_time}}</p> -->
               </div>
             </div>
             <span class="money">
@@ -154,17 +149,12 @@
         <!-- 资料 -->
         <div class="datum">
           <div class="selected-header">
-            <span>资料</span>
+            <span>考试题库</span>
             <p></p>
           </div>
           <ul>
             <li v-for="(item,i) in material" :key="i">
-              <a
-                @click="isLogin(item.file_url)"
-                ref="link_a"
-                :href="link"
-                rel="nofollow"
-              >
+              <a @click="isLogin(item.file_url)" ref="link_a" :href="link" rel="nofollow">
                 <span class="datum-class">
                   <span>{{item.subject}}</span>
                   {{item.materials_name}}
@@ -211,7 +201,7 @@
         </div>
       </div>
     </section>
-    <footer>
+    <footer :class="{images:isSignin}">
       <img src="../assets/img/fei2.png" alt />
       <div>
         <p>+86 &nbsp;</p>
@@ -224,15 +214,23 @@
 
 <script>
 import storage from "../uilt/storage";
-import { HOME } from "../uilt/url";
+import { HOME, DRAW, GETDRAW } from "../uilt/url";
 import axios from "axios";
+import Loading from "../uilt/loading/Loading";
 export default {
+  components: {
+    Loading
+  },
   mounted() {
     this.getHomeData();
+    if (JSON.stringify(storage.getToken()) != "{}") {
+      this.isSignin = true;
+    }
   },
   data() {
     return {
-      link:"javascript:;",
+      isSignin: false,
+      link: "javascript:;",
       mobile: "",
       file: "",
       banner: [], //广告
@@ -247,8 +245,8 @@ export default {
         this.$router.push("/login");
         storage.clear();
         return;
-      }else{
-        this.link ='http://liveapi.canpoint.net/'+url
+      } else {
+        this.link = "http://liveapi.canpoint.net/" + url;
       }
     },
     //资料
@@ -308,14 +306,67 @@ export default {
     },
     goXiangqing(item) {
       storage.save(item);
-      this.$router.push({path:`/databank/${item}`});
+      this.$router.push({ path: `/databank/${item}` });
     },
     //登陆
     goLogin() {
-      if (JSON.stringify(storage.getToken()) == "{}") {
-        this.$router.push("/login");
-        storage.clear();
-      }
+      this.showLoading = true;
+      return new Promise((resolve, reject) => {
+        axios({
+          method: "get",
+          url: DRAW,
+          headers: {
+            Authorization: "bearer" + storage.getToken()
+          }
+        })
+          .then(res => {
+            console.log(res);
+            if (res.data.code == 403) {
+              this.$router.push("/login");
+              storage.clear();
+            } else {
+              if (res.data.code == 1000) {
+                return new Promise((resolve, reject) => {
+                  axios({
+                    method: "post",
+                    url: GETDRAW + "/" + 15,
+                    headers: {
+                      Authorization: "bearer" + storage.getToken()
+                    }
+                  })
+                    .then(res => {
+                      console.log(res);
+                      if (res.data.ret) {
+                        this.$notify({ type: "warning", message: "领取成功" });
+                      } else {
+                        this.$notify({ type: "warning", message: "领取失败" });
+                      }
+                      resolve();
+                      this.showLoading = false;
+                    })
+                    .catch(e => {
+                      this.showLoading = false;
+                      reject(e);
+                    });
+                });
+              } else if (res.data.ret) {
+                this.$notify({ type: "warning", message: "已领取过其他微课" });
+                this.showLoading = false;
+                return;
+              }
+            }
+            this.showLoading = false;
+            resolve();
+          })
+          .catch(e => {
+            this.showLoading = false;
+            reject(e);
+          });
+      });
+      // if (JSON.stringify(storage.getToken()) == "{}") {
+      //   this.$router.push("/login");
+      //   storage.clear();
+      // }
     },
     goLogins() {
       if (JSON.stringify(storage.getToken()) == "{}") {
@@ -331,9 +382,11 @@ export default {
 </script>
 
 <style scoped>
-.video{
+.video {
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 88;
 }
 .van-image img {
   width: 100%;
@@ -418,7 +471,7 @@ footer div {
   background: #f7f7f7;
   display: flex;
   flex-direction: column;
-  margin-bottom: 180px;
+  margin-bottom: 2.5rem;
 }
 .promise-footer {
   height: 98px;
@@ -506,8 +559,9 @@ footer div {
   width: 20px;
   height: 20px;
 } */
-.teaching > img{
-  width: 101%;
+.teaching > img {
+  width: 100%;
+  transform: scale(1.02);
 }
 .teaching {
   height: 1062px;
@@ -538,7 +592,7 @@ footer div {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 .selected div p {
   height: 6px;
@@ -760,6 +814,10 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 99999;
+}
+footer.images{
+  display: none;
 }
 .back {
   width: 100%;
@@ -783,6 +841,9 @@ section {
   background-color: #f3f3f3;
   flex: 1;
   margin-bottom: 167px;
+}
+section.islogin {
+  margin-bottom:0;
 }
 .box {
   display: flex;
